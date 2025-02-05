@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Donut Chart Progress</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            body {
+                padding-top: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="myChart" width="400" height="400"></canvas>
+
+        <script>
+            const userData = [
+                { label: 'Production', data: 10 },
+                { label: 'Development', data: 50 },
+                { label: 'Testing', data: 100 },
+                { label: 'Support', data: 33 },
+            ]
+
+            const colors = [
+                '#09341A',
+                '#1E6737',
+                '#238341',
+                '#2CA650',
+                '#39C865',
+                '#57E186',
+                '#8CF0B0',
+            ]
+
+            const data = {
+                datasets: userData.map((item, index) => {
+                    return {
+                        data: [item.data],
+                        backgroundColor: [colors[index]],
+                        circumference: (ctx) => (ctx.dataset.data[0] / 100) * 360,
+                    }
+                }),
+            }
+
+            const doughnutPath = {
+                id: 'doughnutPath',
+                beforeDatasetsDraw(chart, args, plugins) {
+                    const { ctx, data, options } = chart
+                    const x = chart.getDatasetMeta(0).data[0].x
+                    const y = chart.getDatasetMeta(0).data[0].y
+                    const angle = Math.PI / 180
+                    const datasetLength = data.datasets.length - 1
+
+                    const outerRadius = chart.getDatasetMeta(0).data[0].outerRadius
+                    const innerRadius = chart.getDatasetMeta(datasetLength).data[0].innerRadius
+
+                    ctx.save()
+                    ctx.translate(x, y)
+
+                    ctx.beginPath()
+                    ctx.fillStyle = '#dee2e6'
+                    ctx.arc(0, 0, outerRadius, 0, angle * 360, false)
+                    ctx.fill()
+
+                    ctx.beginPath()
+                    ctx.fillStyle = 'white'
+                    ctx.arc(0, 0, innerRadius, 0, angle * 360, false)
+                    ctx.fill()
+
+                    for (let i = 0; i < datasetLength; i++) {
+                        const innerRadiusD = chart.getDatasetMeta(i).data[0].innerRadius
+                        ctx.beginPath()
+                        ctx.lineWidth = options.borderWidth
+                        ctx.strokeStyle = 'white'
+                        ctx.arc(0, 0, innerRadiusD, 0, angle * 360, false)
+                        ctx.stroke()
+                    }
+
+                    ctx.restore()
+                },
+            }
+
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    borderRadius: 20,
+                    cutOut: '70%',
+                    borderWidth: 3,
+                    borderColor: 'white',
+                    hoverBorderColor: 'white',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+                plugins: [doughnutPath],
+            }
+
+            const myChart = new Chart(document.getElementById('myChart'), config)
+        </script>
+    </body>
+</html>
