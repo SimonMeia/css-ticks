@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Carousel avec plus d'éléments</title>
+        <style>
+            body {
+                padding-top: 100px;
+            }
+
+            /* Conteneur du carousel (viewport) avec un padding pour éviter que les extrémités ne soient coupées */
+            .carousel-container {
+                margin: auto;
+                overflow: hidden;
+                padding: 0 5px; /* Ajuster si besoin */
+                box-sizing: border-box;
+            }
+
+            /* Conteneur alignant les éléments sur une ligne */
+            #navigation {
+                display: flex;
+                align-items: center;
+                gap: 10px; /* Espace entre les éléments */
+                transition: transform 0.3s ease;
+            }
+
+            /* Style de chaque point */
+            .navigation-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background-color: #ccc;
+                flex-shrink: 0;
+                transition: transform 0.3s ease;
+            }
+
+            .navigation-dot.active {
+                background-color: #333;
+            }
+
+            #buttons {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Conteneur du carousel -->
+        <div class="carousel-container" id="carousel-container">
+            <div id="navigation">
+                <!-- Les éléments du carousel seront générés dynamiquement -->
+            </div>
+        </div>
+
+        <div id="buttons">
+            <button id="prev">Prev</button>
+            <button id="next">Next</button>
+        </div>
+
+        <script>
+            const navigation = document.getElementById('navigation')
+            const carouselContainer = document.getElementById('carousel-container')
+            const prevButton = document.getElementById('prev')
+            const nextButton = document.getElementById('next')
+
+            // Nombre total d'éléments à générer pour le carousel
+            const numberOfItems = 12
+
+            // Création dynamique des éléments du carousel
+            for (let i = 0; i < numberOfItems; i++) {
+                const dot = document.createElement('div')
+                dot.classList.add('navigation-dot')
+                // Le premier élément est initialisé comme actif
+                if (i === 0) dot.classList.add('active')
+                navigation.appendChild(dot)
+            }
+
+            // Sélection de tous les éléments générés
+            const navigationDots = document.querySelectorAll('.navigation-dot')
+
+            // CONSTANTES pour définir le nombre d'éléments visibles à gauche et à droite de l'élément actif
+            const visibleSideElements = 2 // par exemple, 2 à gauche et 2 à droite
+            const totalVisibleElements = visibleSideElements * 2 + 1 // incluant l'élément central
+
+            // CONSTANTES pour le changement d'échelle
+            const scaleStep = 0.2 // Diminution de l'échelle par pas
+            const minScale = 0.5 // Échelle minimale
+
+            let currentIndex = 0
+
+            // Ajuste la largeur du conteneur (viewport) en fonction du nombre d'éléments visibles
+            function updateCarouselContainerWidth() {
+                const dotWidth = navigationDots[0].offsetWidth
+                const gap = parseInt(getComputedStyle(navigation).gap) || 10
+                const itemWidth = dotWidth + gap
+                // Calcul : largeur pour totalVisibleElements items (sans compter le dernier gap)
+                const containerWidth = totalVisibleElements * itemWidth - gap
+                carouselContainer.style.width = `${containerWidth}px`
+            }
+
+            // Met à jour l'affichage du carousel : translation pour centrer l'élément actif et échelle progressive
+            function updateActiveDot() {
+                // Mise à jour de la classe "active"
+                navigationDots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex)
+                })
+
+                const dotWidth = navigationDots[0].offsetWidth
+                const gap = parseInt(getComputedStyle(navigation).gap) || 10
+                const itemWidth = dotWidth + gap
+
+                // Calcul de la translation pour centrer l'élément actif
+                const containerCenter = carouselContainer.offsetWidth / 2
+                const activeDotCenter = currentIndex * itemWidth + itemWidth / 2
+                const translateX = containerCenter - activeDotCenter
+                navigation.style.transform = `translateX(${translateX}px)`
+
+                // Mise à l'échelle progressive en fonction de la distance par rapport à l'élément actif
+                navigationDots.forEach((dot, index) => {
+                    let diff = Math.abs(index - currentIndex)
+                    let circularDistance = Math.min(diff, navigationDots.length - diff)
+                    let scale = 1 - circularDistance * scaleStep
+                    if (scale < minScale) scale = minScale
+                    dot.style.transform = `scale(${scale})`
+                })
+            }
+
+            // Gestion des clics sur les boutons "Prev" et "Next"
+            prevButton.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + navigationDots.length) % navigationDots.length
+                updateActiveDot()
+            })
+
+            nextButton.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % navigationDots.length
+                updateActiveDot()
+            })
+
+            // Initialisation lors du chargement et du redimensionnement de la fenêtre
+            window.addEventListener('load', () => {
+                updateCarouselContainerWidth()
+                updateActiveDot()
+            })
+            window.addEventListener('resize', () => {
+                updateCarouselContainerWidth()
+                updateActiveDot()
+            })
+        </script>
+    </body>
+</html>
