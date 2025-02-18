@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Time Picker</title>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background-color: #f0f0f0;
+                margin: 0;
+                font-family: sans-serif;
+            }
+            .picker-container {
+                display: flex;
+                gap: 40px;
+                align-items: center;
+            }
+            .wheel-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .wheel-container {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .wheel-wrapper {
+                height: 240px;
+                overflow: hidden;
+                border: 2px solid #333;
+                border-radius: 10px;
+                width: 80px;
+            }
+            .wheel {
+                display: flex;
+                flex-direction: column;
+                transition: transform 0.3s ease-in-out;
+                justify-content: center;
+                transform: translateY(-80px);
+            }
+            .wheel div {
+                font-size: 40px;
+                font-weight: bold;
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            button {
+                font-size: 20px;
+                padding: 10px;
+                cursor: pointer;
+                border: none;
+                background-color: #007bff;
+                color: white;
+                border-radius: 5px;
+                width: 100%;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="picker-container">
+            <!-- Roue des heures -->
+            <div class="wheel-section">
+                <h2>Heures</h2>
+                <div class="wheel-container">
+                    <button onclick="decrementHour()">-</button>
+                    <div class="wheel-wrapper">
+                        <div class="wheel" id="hour-wheel"></div>
+                    </div>
+                    <button onclick="incrementHour()">+</button>
+                </div>
+            </div>
+
+            <!-- Roue des minutes -->
+            <div class="wheel-section">
+                <h2>Minutes</h2>
+                <div class="wheel-container">
+                    <button onclick="decrementMinutes()">-</button>
+                    <div class="wheel-wrapper">
+                        <div class="wheel" id="minute-wheel"></div>
+                    </div>
+                    <button onclick="incrementMinutes()">+</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Constantes et état
+            const MAX_HOURS = 24
+            const MINUTES_STEP = 5 // en minutes
+
+            // Les heures sont stockées en secondes (multiples de 3600)
+            let currentHourSec = 0 // 0h initialement (0 à (MAX_HOURS-1)*3600)
+            // Les minutes sont stockées en secondes (de 0 à 3600 par tranche MINUTES_STEP*60)
+            let currentMinuteSec = 0
+
+            // Flags de transition pour éviter les animations simultanées
+            let isHourTransitioning = false
+            let isMinuteTransitioning = false
+
+            // Récupération des éléments DOM
+            const hourWheel = document.getElementById('hour-wheel')
+            const minuteWheel = document.getElementById('minute-wheel')
+
+            // Formatage : affiche l'heure (divisé par 3600) et les minutes (divisé par 60, sur 2 chiffres)
+            function formatHour(sec) {
+                return String(sec / 3600).padStart(2, '0')
+            }
+            function formatMinutes(sec) {
+                return String(sec / 60).padStart(2, '0')
+            }
+
+            // Fonctions de calcul pour l'heure et les minutes
+
+            // Ajoute 1 heure (3600 sec) et boucle sur MAX_HOURS
+            function addHour(time) {
+                return (time + 3600) % (MAX_HOURS * 3600)
+            }
+            // Soustrait 1 heure en bouclant
+            function subHour(time) {
+                return (time - 3600 + MAX_HOURS * 3600) % (MAX_HOURS * 3600)
+            }
+            // Ajoute MINUTES_STEP minutes (en secondes). Si dépasse 3600, retourne 0 (et déclenche l'augmentation de l'heure)
+            function addMinutes(time) {
+                if (time + MINUTES_STEP * 60 >= 3600) {
+                    return 0
+                } else {
+                    return time + MINUTES_STEP * 60
+                }
+            }
+            // Soustrait MINUTES_STEP minutes. Si le résultat est négatif, retourne 3600 - (MINUTES_STEP*60) (et déclenche la diminution de l'heure)
+            function subMinutes(time) {
+                if (time - MINUTES_STEP * 60 < 0) {
+                    return 3600 - MINUTES_STEP * 60
+                } else {
+                    return time - MINUTES_STEP * 60
+                }
+            }
+
+            // Crée un élément de la roue avec le texte fourni
+            function createWheelElement(text) {
+                const el = document.createElement('div')
+                el.textContent = text
+                return el
+            }
+
+            // --- Mise en place initiale des roues ---
+
+            function setupHourWheel() {
+                hourWheel.innerHTML = ''
+                const prevHour = subHour(currentHourSec)
+                const hiddenPrevHour = subHour(prevHour)
+                const currHour = currentHourSec
+                const nextHour = addHour(currentHourSec)
+                const hiddenNextHour = addHour(nextHour)
+
+                hourWheel.appendChild(createWheelElement(formatHour(hiddenPrevHour)))
+                hourWheel.appendChild(createWheelElement(formatHour(prevHour)))
+                hourWheel.appendChild(createWheelElement(formatHour(currHour)))
+                hourWheel.appendChild(createWheelElement(formatHour(nextHour)))
+                hourWheel.appendChild(createWheelElement(formatHour(hiddenNextHour)))
+            }
+
+            function setupMinuteWheel() {
+                minuteWheel.innerHTML = ''
+                const prevMinute = subMinutes(currentMinuteSec)
+                const hiddenPrevMinute = subMinutes(prevMinute)
+                const currMinute = currentMinuteSec
+                const nextMinute = addMinutes(currentMinuteSec)
+                const hiddenNextMinute = addMinutes(nextMinute)
+
+                minuteWheel.appendChild(createWheelElement(formatMinutes(hiddenPrevMinute)))
+                minuteWheel.appendChild(createWheelElement(formatMinutes(prevMinute)))
+                minuteWheel.appendChild(createWheelElement(formatMinutes(currMinute)))
+                minuteWheel.appendChild(createWheelElement(formatMinutes(nextMinute)))
+                minuteWheel.appendChild(createWheelElement(formatMinutes(hiddenNextMinute)))
+            }
+
+            setupHourWheel()
+            setupMinuteWheel()
+
+            // --- Animation de la roue des heures ---
+
+            function incrementHour() {
+                if (isHourTransitioning) return
+                isHourTransitioning = true
+                hourWheel.style.transition = 'transform 0.3s ease-in-out'
+                hourWheel.style.transform = 'translateY(-160px)'
+
+                hourWheel.addEventListener('transitionend', function handler() {
+                    hourWheel.removeEventListener('transitionend', handler)
+                    // Retirer l'élément en haut
+                    hourWheel.removeChild(hourWheel.firstElementChild)
+                    // Mettre à jour l'état
+                    currentHourSec = addHour(currentHourSec)
+                    // Ajouter le nouvel élément en bas
+                    const newNext = addHour(addHour(currentHourSec))
+                    hourWheel.appendChild(createWheelElement(formatHour(newNext)))
+                    // Réinitialiser la translation
+                    hourWheel.style.transition = 'none'
+                    hourWheel.style.transform = 'translateY(-80px)'
+                    void hourWheel.offsetWidth
+                    isHourTransitioning = false
+                })
+            }
+
+            function decrementHour() {
+                if (isHourTransitioning) return
+                isHourTransitioning = true
+                hourWheel.style.transition = 'transform 0.3s ease-in-out'
+                hourWheel.style.transform = 'translateY(0)'
+
+                hourWheel.addEventListener('transitionend', function handler() {
+                    hourWheel.removeEventListener('transitionend', handler)
+                    // Retirer l'élément en bas
+                    hourWheel.removeChild(hourWheel.lastElementChild)
+                    // Mettre à jour l'état
+                    currentHourSec = subHour(currentHourSec)
+                    // Ajouter le nouvel élément en haut
+                    const newPrev = subHour(subHour(currentHourSec))
+                    hourWheel.insertBefore(
+                        createWheelElement(formatHour(newPrev)),
+                        hourWheel.firstElementChild
+                    )
+                    // Réinitialiser la translation
+                    hourWheel.style.transition = 'none'
+                    hourWheel.style.transform = 'translateY(-80px)'
+                    void hourWheel.offsetWidth
+                    isHourTransitioning = false
+                })
+            }
+
+            // --- Animation de la roue des minutes ---
+
+            function incrementMinutes() {
+                if (isMinuteTransitioning) return
+                isMinuteTransitioning = true
+                minuteWheel.style.transition = 'transform 0.3s ease-in-out'
+                // Pour avancer, on translate jusqu'à -160px (déplacement d'un cran)
+                minuteWheel.style.transform = 'translateY(-160px)'
+
+                minuteWheel.addEventListener('transitionend', function handler() {
+                    minuteWheel.removeEventListener('transitionend', handler)
+                    // Retirer l'élément le plus haut
+                    minuteWheel.removeChild(minuteWheel.firstElementChild)
+                    // Calcul de la nouvelle valeur minute
+                    const newMinute = addMinutes(currentMinuteSec)
+                    // En cas de wrap-around (ex. de 55 à 00), on augmente l'heure
+                    if (newMinute < currentMinuteSec) {
+                        currentHourSec = addHour(currentHourSec)
+                        setupHourWheel()
+                    }
+                    currentMinuteSec = newMinute
+                    // Ajouter le nouvel élément en bas (l'élément caché suivant)
+                    const newNext = addMinutes(addMinutes(currentMinuteSec))
+                    minuteWheel.appendChild(createWheelElement(formatMinutes(newNext)))
+                    // Réinitialisation de la translation pour remettre l'élément central en vue
+                    minuteWheel.style.transition = 'none'
+                    minuteWheel.style.transform = 'translateY(-80px)'
+                    void minuteWheel.offsetWidth
+                    isMinuteTransitioning = false
+                })
+            }
+
+            function decrementMinutes() {
+                if (isMinuteTransitioning) return
+                isMinuteTransitioning = true
+                minuteWheel.style.transition = 'transform 0.3s ease-in-out'
+                // Pour reculer, on translate jusqu'à 0 (déplacement d'un cran vers le bas)
+                minuteWheel.style.transform = 'translateY(0)'
+
+                minuteWheel.addEventListener('transitionend', function handler() {
+                    minuteWheel.removeEventListener('transitionend', handler)
+                    // Retirer l'élément le plus bas
+                    minuteWheel.removeChild(minuteWheel.lastElementChild)
+                    // Calcul de la nouvelle valeur minute
+                    const newMinute = subMinutes(currentMinuteSec)
+                    // En cas de wrap-around (ex. de 00 à 55), on diminue l'heure
+                    if (newMinute > currentMinuteSec) {
+                        currentHourSec = subHour(currentHourSec)
+                        setupHourWheel()
+                    }
+                    currentMinuteSec = newMinute
+                    // Ajouter le nouvel élément en haut (l'élément caché précédent)
+                    const newPrev = subMinutes(subMinutes(currentMinuteSec))
+                    minuteWheel.insertBefore(
+                        createWheelElement(formatMinutes(newPrev)),
+                        minuteWheel.firstElementChild
+                    )
+                    // Réinitialisation de la translation pour remettre l'élément central en vue
+                    minuteWheel.style.transition = 'none'
+                    minuteWheel.style.transform = 'translateY(-80px)'
+                    void minuteWheel.offsetWidth
+                    isMinuteTransitioning = false
+                })
+            }
+        </script>
+    </body>
+</html>
