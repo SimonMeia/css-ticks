@@ -114,6 +114,14 @@
             const MAX_HOURS = 24
             const MINUTES_STEP = 5 // en minutes
 
+            const wheelElementsStyle = [
+                { rotation: 'rotateX(90deg)', opacity: '0.1' },
+                { rotation: 'rotateX(45deg)', opacity: '0.4' },
+                { rotation: 'rotateX(0deg)', opacity: '1' },
+                { rotation: 'rotateX(-45deg)', opacity: '0.4' },
+                { rotation: 'rotateX(-90deg)', opacity: '0.1' },
+            ]
+
             // Les heures et minutes sont stockées en secondes
             let currentHourSec = 0 // 0h initialement
             let currentMinuteSec = 0
@@ -128,9 +136,9 @@
              * Fonctions utilitaires      *
              ******************************/
             // Met à jour le style d'un élément enfant
-            function setChildStyle(child, transform, opacity) {
-                child.style.transform = transform
-                child.style.opacity = opacity
+            function setChildStyle(child, wheelElementStyle) {
+                child.style.transform = wheelElementStyle.rotation
+                child.style.opacity = wheelElementStyle.opacity
             }
 
             // Force le recalcul du layout pour réinitialiser les transitions
@@ -139,12 +147,16 @@
             }
 
             // Crée et retourne un élément div avec le texte donné
-            function createWheelElement(text) {
+            function createWheelElement(wheel, text, position, direction = 'after') {
                 const el = document.createElement('div')
                 el.textContent = text
-                return el
+                setChildStyle(el, wheelElementsStyle[position])
+                if (direction === 'after') {
+                    wheel.appendChild(el)
+                } else {
+                    wheel.insertBefore(el, wheel.firstChild)
+                }
             }
-
             /******************************
              * Fonctions de formatage     *
              ******************************/
@@ -178,20 +190,6 @@
             }
 
             /******************************
-             * Gestion des rotations 3D   *
-             ******************************/
-            // Applique les rotations et opacités par défaut aux 5 enfants d'une roue
-            function applyDefaultRotations(wheel) {
-                const children = wheel.children
-                if (children.length < 5) return
-                setChildStyle(children[0], 'rotateX(90deg)', '0.1')
-                setChildStyle(children[1], 'rotateX(45deg)', '0.4')
-                setChildStyle(children[2], 'rotateX(0deg)', '1')
-                setChildStyle(children[3], 'rotateX(-45deg)', '0.4')
-                setChildStyle(children[4], 'rotateX(-90deg)', '0.1')
-            }
-
-            /******************************
              * Initialisation des Roues   *
              ******************************/
             function setupHourWheel() {
@@ -203,13 +201,11 @@
                 const nextHour = addHour(currentHourSec)
                 const hiddenNextHour = addHour(nextHour)
 
-                hourWheel.appendChild(createWheelElement(formatHour(hiddenPrevHour)))
-                hourWheel.appendChild(createWheelElement(formatHour(prevHour)))
-                hourWheel.appendChild(createWheelElement(formatHour(currHour)))
-                hourWheel.appendChild(createWheelElement(formatHour(nextHour)))
-                hourWheel.appendChild(createWheelElement(formatHour(hiddenNextHour)))
-
-                applyDefaultRotations(hourWheel)
+                createWheelElement(hourWheel, formatHour(hiddenPrevHour), 0)
+                createWheelElement(hourWheel, formatHour(prevHour), 1)
+                createWheelElement(hourWheel, formatHour(currHour), 2)
+                createWheelElement(hourWheel, formatHour(nextHour), 3)
+                createWheelElement(hourWheel, formatHour(hiddenNextHour), 4)
             }
 
             function setupMinuteWheel() {
@@ -221,13 +217,11 @@
                 const nextMinute = addMinutes(currentMinuteSec)
                 const hiddenNextMinute = addMinutes(nextMinute)
 
-                minuteWheel.appendChild(createWheelElement(formatMinutes(hiddenPrevMinute)))
-                minuteWheel.appendChild(createWheelElement(formatMinutes(prevMinute)))
-                minuteWheel.appendChild(createWheelElement(formatMinutes(currMinute)))
-                minuteWheel.appendChild(createWheelElement(formatMinutes(nextMinute)))
-                minuteWheel.appendChild(createWheelElement(formatMinutes(hiddenNextMinute)))
-
-                applyDefaultRotations(minuteWheel)
+                createWheelElement(minuteWheel, formatMinutes(hiddenPrevMinute), 0)
+                createWheelElement(minuteWheel, formatMinutes(prevMinute), 1)
+                createWheelElement(minuteWheel, formatMinutes(currMinute), 2)
+                createWheelElement(minuteWheel, formatMinutes(nextMinute), 3)
+                createWheelElement(minuteWheel, formatMinutes(hiddenNextMinute), 4)
             }
 
             // Initialisation des roues
@@ -241,23 +235,7 @@
                 if (isHourTransitioning) return
                 isHourTransitioning = true
 
-                // Animation de translation vers le haut
-                hourWheel.style.transition = 'transform 0.3s ease-in-out'
-                hourWheel.style.transform = 'translateY(-160px)'
-
-                const children = hourWheel.children
-                if (children.length === 5) {
-                    // Appliquer la transition aux enfants
-                    for (let i = 0; i < 5; i++) {
-                        children[i].style.transition =
-                            'transform 0.3s ease-in-out, opacity 0.3s ease-in-out'
-                    }
-                    // Définir les nouvelles rotations pendant la transition
-                    setChildStyle(children[1], 'rotateX(90deg)', '0.1')
-                    setChildStyle(children[2], 'rotateX(45deg)', '0.4')
-                    setChildStyle(children[3], 'rotateX(0deg)', '1')
-                    setChildStyle(children[4], 'rotateX(-45deg)', '0.4')
-                }
+                rotateTop(hourWheel)
 
                 hourWheel.addEventListener('transitionend', function handler() {
                     hourWheel.removeEventListener('transitionend', handler)
@@ -267,16 +245,11 @@
 
                     // Ajouter le nouvel élément à la fin de la roue
                     const newNext = addHour(addHour(currentHourSec))
-                    const newChild = createWheelElement(formatHour(newNext))
-                    newChild.style.transform = 'rotateX(-90deg)'
-                    newChild.style.opacity = '0.1'
-                    newChild.style.transition = 'none'
-                    hourWheel.appendChild(newChild)
+                    createWheelElement(hourWheel, formatHour(newNext), 4)
 
                     // Réinitialisation de la position et des transitions
                     hourWheel.style.transition = 'none'
                     hourWheel.style.transform = 'translateY(-80px)'
-                    applyDefaultRotations(hourWheel)
                     forceReflow(hourWheel)
                     isHourTransitioning = false
                 })
@@ -286,21 +259,7 @@
                 if (isHourTransitioning) return
                 isHourTransitioning = true
 
-                // Animation de translation vers le bas
-                hourWheel.style.transition = 'transform 0.3s ease-in-out'
-                hourWheel.style.transform = 'translateY(0)'
-
-                const children = hourWheel.children
-                if (children.length === 5) {
-                    for (let i = 0; i < 5; i++) {
-                        children[i].style.transition =
-                            'transform 0.3s ease-in-out, opacity 0.3s ease-in-out'
-                    }
-                    setChildStyle(children[0], 'rotateX(45deg)', '0.4')
-                    setChildStyle(children[1], 'rotateX(0deg)', '1')
-                    setChildStyle(children[2], 'rotateX(-45deg)', '0.4')
-                    setChildStyle(children[3], 'rotateX(-90deg)', '0.1')
-                }
+                rotateBot(hourWheel)
 
                 hourWheel.addEventListener('transitionend', function handler() {
                     hourWheel.removeEventListener('transitionend', handler)
@@ -310,15 +269,10 @@
 
                     // Ajouter le nouvel élément en début de roue
                     const newPrev = subHour(subHour(currentHourSec))
-                    const newChild = createWheelElement(formatHour(newPrev))
-                    newChild.style.transform = 'rotateX(90deg)'
-                    newChild.style.opacity = '0.1'
-                    newChild.style.transition = 'none'
-                    hourWheel.insertBefore(newChild, hourWheel.firstElementChild)
+                    createWheelElement(hourWheel, formatHour(newPrev), 0, 'before')
 
                     hourWheel.style.transition = 'none'
                     hourWheel.style.transform = 'translateY(-80px)'
-                    applyDefaultRotations(hourWheel)
                     forceReflow(hourWheel)
                     isHourTransitioning = false
                 })
@@ -331,20 +285,7 @@
                 if (isMinuteTransitioning) return
                 isMinuteTransitioning = true
 
-                minuteWheel.style.transition = 'transform 0.3s ease-in-out'
-                minuteWheel.style.transform = 'translateY(-160px)'
-
-                const children = minuteWheel.children
-                if (children.length === 5) {
-                    for (let i = 0; i < 5; i++) {
-                        children[i].style.transition =
-                            'transform 0.3s ease-in-out, opacity 0.3s ease-in-out'
-                    }
-                    setChildStyle(children[1], 'rotateX(90deg)', '0.1')
-                    setChildStyle(children[2], 'rotateX(45deg)', '0.4')
-                    setChildStyle(children[3], 'rotateX(0deg)', '1')
-                    setChildStyle(children[4], 'rotateX(-45deg)', '0.4')
-                }
+                rotateTop(minuteWheel)
 
                 minuteWheel.addEventListener('transitionend', function handler() {
                     minuteWheel.removeEventListener('transitionend', handler)
@@ -362,15 +303,10 @@
 
                     // Ajouter un nouvel élément à la fin
                     const newNext = addMinutes(addMinutes(currentMinuteSec))
-                    const newChild = createWheelElement(formatMinutes(newNext))
-                    newChild.style.transform = 'rotateX(-90deg)'
-                    newChild.style.opacity = '0.1'
-                    newChild.style.transition = 'none'
-                    minuteWheel.appendChild(newChild)
+                    createWheelElement(minuteWheel, formatMinutes(newNext), 4)
 
                     minuteWheel.style.transition = 'none'
                     minuteWheel.style.transform = 'translateY(-80px)'
-                    applyDefaultRotations(minuteWheel)
                     forceReflow(minuteWheel)
                     isMinuteTransitioning = false
                 })
@@ -380,20 +316,7 @@
                 if (isMinuteTransitioning) return
                 isMinuteTransitioning = true
 
-                minuteWheel.style.transition = 'transform 0.3s ease-in-out'
-                minuteWheel.style.transform = 'translateY(0)'
-
-                const children = minuteWheel.children
-                if (children.length === 5) {
-                    for (let i = 0; i < 5; i++) {
-                        children[i].style.transition =
-                            'transform 0.3s ease-in-out, opacity 0.3s ease-in-out'
-                    }
-                    setChildStyle(children[0], 'rotateX(45deg)', '0.4')
-                    setChildStyle(children[1], 'rotateX(0deg)', '1')
-                    setChildStyle(children[2], 'rotateX(-45deg)', '0.4')
-                    setChildStyle(children[3], 'rotateX(-90deg)', '0.1')
-                }
+                rotateBot(minuteWheel)
 
                 minuteWheel.addEventListener('transitionend', function handler() {
                     minuteWheel.removeEventListener('transitionend', handler)
@@ -411,18 +334,47 @@
 
                     // Ajouter un nouvel élément en début de roue
                     const newPrev = subMinutes(subMinutes(currentMinuteSec))
-                    const newChild = createWheelElement(formatMinutes(newPrev))
-                    newChild.style.transform = 'rotateX(90deg)'
-                    newChild.style.opacity = '0.1'
-                    newChild.style.transition = 'none'
-                    minuteWheel.insertBefore(newChild, minuteWheel.firstElementChild)
+                    createWheelElement(minuteWheel, formatMinutes(newPrev), 0, 'before')
 
                     minuteWheel.style.transition = 'none'
                     minuteWheel.style.transform = 'translateY(-80px)'
-                    applyDefaultRotations(minuteWheel)
                     forceReflow(minuteWheel)
                     isMinuteTransitioning = false
                 })
+            }
+
+            function rotateTop(wheel) {
+                wheel.style.transition = 'transform 0.3s ease-in-out'
+                wheel.style.transform = 'translateY(-160px)'
+
+                const children = wheel.children
+                if (children.length === 5) {
+                    for (let i = 0; i < 5; i++) {
+                        children[i].style.transition =
+                            'transform 0.3s ease-in-out, opacity 0.3s ease-in-out'
+                    }
+                    setChildStyle(children[1], wheelElementsStyle[0])
+                    setChildStyle(children[2], wheelElementsStyle[1])
+                    setChildStyle(children[3], wheelElementsStyle[2])
+                    setChildStyle(children[4], wheelElementsStyle[3])
+                }
+            }
+
+            function rotateBot(wheel) {
+                wheel.style.transition = 'transform 0.3s ease-in-out'
+                wheel.style.transform = 'translateY(0)'
+
+                const children = wheel.children
+                if (children.length === 5) {
+                    for (let i = 0; i < 5; i++) {
+                        children[i].style.transition =
+                            'transform 0.3s ease-in-out, opacity 0.3s ease-in-out'
+                    }
+                    setChildStyle(children[0], wheelElementsStyle[1])
+                    setChildStyle(children[1], wheelElementsStyle[2])
+                    setChildStyle(children[2], wheelElementsStyle[3])
+                    setChildStyle(children[3], wheelElementsStyle[4])
+                }
             }
         </script>
     </body>
