@@ -195,8 +195,8 @@
             function setupHourWheel() {
                 hourWheel.innerHTML = ''
 
-                const hiddenPrevHour = subHour(subHour(currentHourSec))
                 const prevHour = subHour(currentHourSec)
+                const hiddenPrevHour = subHour(prevHour)
                 const currHour = currentHourSec
                 const nextHour = addHour(currentHourSec)
                 const hiddenNextHour = addHour(nextHour)
@@ -211,8 +211,8 @@
             function setupMinuteWheel() {
                 minuteWheel.innerHTML = ''
 
-                const hiddenPrevMinute = subMinutes(subMinutes(currentMinuteSec))
                 const prevMinute = subMinutes(currentMinuteSec)
+                const hiddenPrevMinute = subMinutes(prevMinute)
                 const currMinute = currentMinuteSec
                 const nextMinute = addMinutes(currentMinuteSec)
                 const hiddenNextMinute = addMinutes(nextMinute)
