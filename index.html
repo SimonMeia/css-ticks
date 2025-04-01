@@ -5,8 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
-            .card:hover ~ .card {
-                transform: translateX(150px);
+            video,
+            img {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16 / 9;
+                object-fit: cover;
+                border-radius: 4px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
         </style>
     </head>
@@ -31,37 +37,56 @@
 
         <div class="w-full grid grid-flow-row gap-8 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             <a href="./cards-preview-transition.html">
-                <div class="rounded-lg bg-gray-200 p-4 shadow-lg">
+                <div
+                    class="rounded-lg bg-gray-200 p-4 shadow-lg hover:scale-[102%] transition-all duration-300"
+                >
                     <h1 class="text-lg font-bold mb-2">Cards preview transition</h1>
                     <video src="./medias/cards-preview-transition.webm" autoplay loop muted></video>
                 </div>
             </a>
 
             <a href="./progress-chart-js.html">
-                <div class="rounded-lg bg-gray-200 p-4 shadow-lg">
+                <div
+                    class="rounded-lg bg-gray-200 p-4 shadow-lg hover:scale-[102%] transition-all duration-300"
+                >
                     <h1 class="text-lg font-bold mb-2">Progress chart JS</h1>
                     <video src="./medias/progress.webm" autoplay loop muted></video>
                 </div>
             </a>
 
             <a href="./carousel-navigation.html">
-                <div class="rounded-lg bg-gray-200 p-4 shadow-lg">
+                <div
+                    class="rounded-lg bg-gray-200 p-4 shadow-lg hover:scale-[102%] transition-all duration-300"
+                >
                     <h1 class="text-lg font-bold mb-2">Carousel navigation</h1>
                     <video src="./medias/carousel-navigation.webm" autoplay loop muted></video>
                 </div>
             </a>
 
             <a href="./time-picker.html">
-                <div class="rounded-lg bg-gray-200 p-4 shadow-lg">
+                <div
+                    class="rounded-lg bg-gray-200 p-4 shadow-lg hover:scale-[102%] transition-all duration-300"
+                >
                     <h1 class="text-lg font-bold mb-2">Wheel Time Picker</h1>
                     <video src="./medias/time-picker.webm" autoplay loop muted></video>
                 </div>
             </a>
 
             <a href="./time-picker.html">
-                <div class="rounded-lg bg-gray-200 p-4 shadow-lg">
+                <div
+                    class="rounded-lg bg-gray-200 p-4 shadow-lg hover:scale-[102%] transition-all duration-300"
+                >
                     <h1 class="text-lg font-bold mb-2">Steps</h1>
                     <video src="./medias/steps.webm" autoplay loop muted></video>
+                </div>
+            </a>
+
+            <a href="./april-fool.html">
+                <div
+                    class="rounded-lg bg-gray-200 p-4 shadow-lg hover:scale-[102%] transition-all duration-300"
+                >
+                    <h1 class="text-lg font-bold mb-2">April Fool</h1>
+                    <video src="./medias/april-fool.webm" autoplay loop muted></video>
                 </div>
             </a>
         </div>

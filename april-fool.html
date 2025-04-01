@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mon Blog Tech | Poisson d'Avril 2025</title>
+        <style>
+            body {
+                transform: rotate(0.3deg);
+                animation: subtle-wobble 20s ease-in-out infinite;
+                overflow-x: hidden;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+                color: #333;
+                background-color: #f9f9f9;
+            }
+
+            @keyframes subtle-wobble {
+                0% {
+                    transform: rotate(0.3deg);
+                }
+                50% {
+                    transform: rotate(-0.3deg);
+                }
+                100% {
+                    transform: rotate(0.3deg);
+                }
+            }
+
+            header {
+                background-color: #2c3e50;
+                color: white;
+                padding: 20px 0;
+                text-align: center;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .site-title {
+                margin: 0;
+                font-size: 32px;
+            }
+
+            nav {
+                background-color: #34495e;
+                padding: 10px 0;
+            }
+
+            nav ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0 15px;
+            }
+
+            nav ul li a {
+                color: white;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s;
+            }
+
+            nav ul li a:hover {
+                color: #3498db;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+
+            .post {
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                padding: 30px;
+                margin-bottom: 40px;
+            }
+
+            .post-title {
+                margin-top: 0;
+                color: #2c3e50;
+                font-size: 28px;
+            }
+
+            .post-meta {
+                color: #7f8c8d;
+                font-size: 14px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+            }
+
+            .post-meta .author {
+                font-weight: 600;
+                margin-right: 15px;
+            }
+
+            .post-meta .date {
+                display: flex;
+                align-items: center;
+            }
+
+            .post-meta .date::before {
+                content: '•';
+                margin: 0 10px;
+            }
+
+            .post-content p {
+                margin-bottom: 20px;
+            }
+
+            .post-content img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 6px;
+                margin: 25px 0;
+            }
+
+            .post-content h2 {
+                color: #2c3e50;
+                margin-top: 30px;
+            }
+
+            .post-content code {
+                background-color: #f7f7f7;
+                padding: 2px 5px;
+                border-radius: 3px;
+                font-family: Consolas, Monaco, 'Andale Mono', monospace;
+                font-size: 0.9em;
+            }
+
+            .post-content pre {
+                background-color: #f7f7f7;
+                padding: 15px;
+                border-radius: 5px;
+                overflow-x: auto;
+            }
+
+            .comments {
+                margin-top: 50px;
+            }
+
+            .comments h3 {
+                color: #2c3e50;
+                border-bottom: 1px solid #ecf0f1;
+                padding-bottom: 10px;
+            }
+
+            .comment {
+                border-bottom: 1px solid #ecf0f1;
+                padding: 20px 0;
+            }
+
+            .comment-author {
+                font-weight: 600;
+                margin-bottom: 5px;
+            }
+
+            .comment-date {
+                color: #7f8c8d;
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
+
+            .sidebar {
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                padding: 20px;
+            }
+
+            .sidebar h3 {
+                color: #2c3e50;
+                border-bottom: 1px solid #ecf0f1;
+                padding-bottom: 10px;
+                margin-top: 0;
+            }
+
+            .sidebar ul {
+                padding-left: 20px;
+            }
+
+            .sidebar li {
+                margin-bottom: 8px;
+            }
+
+            .sidebar a {
+                color: #3498db;
+                text-decoration: none;
+            }
+
+            .sidebar a:hover {
+                text-decoration: underline;
+            }
+
+            footer {
+                background-color: #2c3e50;
+                color: white;
+                text-align: center;
+                padding: 20px 0;
+                margin-top: 50px;
+            }
+
+            @media (max-width: 768px) {
+                .container {
+                    padding: 0 15px;
+                }
+                .post {
+                    padding: 20px;
+                }
+            }
+
+            .highlight {
+                background-color: #fff4cc;
+                padding: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1 class="site-title">Mon Blog Tech</h1>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#">Accueil</a></li>
+                <li><a href="#">Articles</a></li>
+                <li><a href="#">Tutoriels</a></li>
+                <li><a href="#">À propos</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+
+        <div class="container">
+            <main>
+                <article class="post">
+                    <h2 class="post-title">
+                        Les CSS Subtils qui Changent Tout : 5 Astuces Pour Améliorer l'UX
+                    </h2>
+                    <div class="post-meta">
+                        <span class="author">Par Sophie Martin</span>
+                        <span class="date">1 avril 2025</span>
+                    </div>
+
+                    <div class="post-content">
+                        <p>
+                            Bienvenue à tous ! Aujourd'hui, j'aimerais partager avec vous quelques
+                            astuces CSS qui peuvent sembler subtiles mais qui font une réelle
+                            différence dans l'expérience utilisateur de vos sites web.
+                        </p>
+
+                        <img src="https://placehold.co/800x400" alt="CSS illustration" />
+
+                        <p>
+                            Quand on parle d'UX (expérience utilisateur), on pense souvent aux
+                            grands concepts de design, aux parcours utilisateurs ou aux
+                            fonctionnalités. Pourtant, de petits détails CSS peuvent transformer
+                            radicalement la façon dont les utilisateurs perçoivent et interagissent
+                            avec votre site.
+                        </p>
+
+                        <h2>1. Les micro-animations qui font la différence</h2>
+
+                        <p>
+                            Les micro-animations sont ces petits mouvements qui se produisent
+                            lorsqu'un utilisateur interagit avec votre interface. Elles peuvent être
+                            si subtiles que l'utilisateur ne les remarque pas consciemment, mais
+                            elles contribuent à rendre l'expérience plus fluide et plus engageante.
+                        </p>
+
+                        <p>Par exemple, une légère transformation lors du survol d'un bouton :</p>
+
+                        <pre>
+                            <code>
+                                .button {
+                                    transition: transform 0.2s ease;
+                                }
+
+                                .button:hover {
+                                    transform: scale(1.05);
+                                }
+                            </code>
+                        </pre>
+
+                        <h2>2. L'effet de wobble pour attirer l'attention</h2>
+
+                        <p>
+                            Un effet d'oscillation subtil peut être utilisé pour attirer l'attention
+                            sur certains éléments sans être intrusif. C'est particulièrement utile
+                            pour les notifications ou les appels à l'action.
+                            <span class="highlight">
+                                Saviez-vous que cette page utilise actuellement un effet de wobble
+                                très léger ? Regardez attentivement les bords de votre écran...
+                            </span>
+                        </p>
+
+                        <pre>
+                            <code>
+                                @keyframes subtle-wobble {
+                                    0% { transform: rotate(.3deg); }
+                                    50% { transform: rotate(-.3deg); }
+                                    100% { transform: rotate(.3deg); }
+                                }
+
+                                .element {
+                                    animation: subtle-wobble 20s ease-in-out infinite;
+                                }
+                                </code>
+                        </pre>
+                        <h2>3. Le scroll smooth pour une navigation fluide</h2>
+
+                        <p>
+                            La propriété CSS
+                            <code>scroll-behavior: smooth</code> permet d'ajouter un défilement
+                            fluide lorsque l'utilisateur clique sur un lien d'ancrage. C'est un
+                            petit détail qui améliore considérablement la navigation sur votre site.
+                        </p>
+
+                        <pre>
+                            <code>
+                                html {
+                                    scroll-behavior: smooth;
+                                }
+                            </code>
+                        </pre>
+
+                        <h2>4. Les transitions de couleur progressives</h2>
+
+                        <p>
+                            Au lieu de changer brusquement la couleur d'un élément lors d'une
+                            interaction, utilisez une transition douce pour créer une expérience
+                            plus agréable :
+                        </p>
+
+                        <pre>
+                            <code>
+                                a {
+                                    color: #3498db;
+                                    transition: color 0.3s ease;
+                                }
+
+                                    a:hover {
+                                    color: #2980b9;
+                                }
+                            </code>
+                        </pre>
+
+                        <h2>5. L'effet de focus amélioré</h2>
+
+                        <p>
+                            Le style par défaut de l'outline lors du focus n'est pas toujours
+                            esthétique. Vous pouvez l'améliorer tout en conservant l'accessibilité :
+                        </p>
+
+                        <pre>
+                            <code>
+                                button:focus {
+                                    outline: none;
+                                    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.5);
+                                    transition: box-shadow 0.3s ease;
+                                }
+                                </code>
+                        </pre>
+
+                        <p>
+                            Ces petites touches CSS peuvent sembler insignifiantes individuellement,
+                            mais ensemble, elles créent une expérience utilisateur plus raffinée et
+                            professionnelle. N'hésitez pas à expérimenter avec ces techniques sur
+                            vos propres projets !
+                        </p>
+
+                        <p>
+                            Et vous, quelles sont vos astuces CSS préférées pour améliorer l'UX ?
+                            Partagez-les dans les commentaires ci-dessous !
+                        </p>
+                    </div>
+                </article>
+
+                <section class="comments">
+                    <h3>Commentaires (3)</h3>
+
+                    <div class="comment">
+                        <div class="comment-author">Thomas Dubois</div>
+                        <div class="comment-date">1 avril 2025 - 09:45</div>
+                        <p>
+                            Super article ! J'utilise beaucoup les micro-animations mais je n'avais
+                            jamais pensé à l'effet de wobble. Je vais tester ça sur mon prochain
+                            projet.
+                        </p>
+                    </div>
+
+                    <div class="comment">
+                        <div class="comment-author">Léa Martin</div>
+                        <div class="comment-date">1 avril 2025 - 10:12</div>
+                        <p>
+                            Est-ce que je suis la seule à trouver que cette page est légèrement
+                            penchée ? J'ai l'impression que mon écran est de travers... 🤔
+                        </p>
+                    </div>
+
+                    <div class="comment">
+                        <div class="comment-author">Antoine Lefebvre</div>
+                        <div class="comment-date">1 avril 2025 - 10:30</div>
+                        <p>
+                            @Léa C'est l'effet de wobble dont parle l'article ! Joli poisson d'avril
+                            de la part de Sophie 😂
+                        </p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <footer>
+            <p>© 2025 Mon Blog Tech - Tous droits réservés</p>
+        </footer>
+    </body>
+</html>
